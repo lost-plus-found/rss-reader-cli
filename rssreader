@@ -1,0 +1,23 @@
+#!/usr/bin/python
+from bs4 import BeautifulSoup
+import os
+import sys
+
+if len(sys.argv) != 2:
+	print 'Use as %s <url>' % (sys.argv[0])
+	exit()
+
+url 	= sys.argv[1]
+os.system('curl -s -o .page.html "'+ url +'"')
+page 	= open('./.page.html')
+soup	= BeautifulSoup(page, 'html.parser')
+items 	= soup.find_all('item')
+
+i = len(items)
+for item in reversed(items):
+	title	= "\033[92m {}\033[00m".format(item.title.string.encode("ascii", "ignore"))
+	link	= "\033[93m {}\033[00m".format(item.link.string.encode("ascii", "ignore"))
+	num	= "\033[91m {}\033[00m".format(str(i))
+	print(num + ' ' + title + '\n' + link + '\n')
+	i -= 1
+os.system('rm .page.html')

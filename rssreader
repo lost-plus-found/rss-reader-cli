@@ -34,21 +34,22 @@ def addData(data):
 	data.write(name + ' ' + url + '\n')
 	print 'Done.'
 
-if __name__ == '__main__':
-	data = open('~/.myrsslinks.csv', 'a+')
+if __name__ == '__main__':	
+	home = os.environ['HOME']
+	data = open(home+'/.myrsslinks.csv', 'a+')
 
 	if len(sys.argv) == 1:
 		totaldata = displayNames(data, 1)
 		if not totaldata:
 			print 'No data is present'
-			print 'to add use like %s --add' % (sys.argv[0])
+			print 'to add use like rssreader --add'
 			exit()
 		sno = int(raw_input('Pick from above numbers: '))
 		try:
 			getFeed(totaldata[sno][1])
 		except IndexError:
 			print 'Invalid number'
-			print 'to add use like %s --add' % (sys.argv[0])
+			print 'to add use like rssreader --add'
 			exit()
 	elif len(sys.argv) == 2:
 		if 'http' in sys.argv[1]:
@@ -60,7 +61,7 @@ if __name__ == '__main__':
 				getFeed(totaldata[sno][1])
 			except IndexError:
 				print 'No such number exists'
-				print 'to add use like %s --add' % (sys.argv[0])
+				print 'to add use like rssreader --add'
 				exit()
 		elif sys.argv[1] == '--add':
 			addData(data)

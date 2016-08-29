@@ -3,21 +3,66 @@ from bs4 import BeautifulSoup
 import os
 import sys
 
-if len(sys.argv) != 2:
-	print 'Use as %s <url>' % (sys.argv[0])
-	exit()
+def getFeed(url):
+	os.system('curl -s -o .page.html "'+ url +'"')
+	page 	= open('./.page.html')
+	soup	= BeautifulSoup(page, 'html.parser')
+	items 	= soup.find_all('item')
+	i = len(items)
+	for item in reversed(items):
+		title	= "\033[92m {}\033[00m".format(item.title.string.encode("ascii", "ignore"))
+		link	= "\033[93m {}\033[00m".format(item.link.string.encode("ascii", "ignore"))
+		num	= "\033[91m {}\033[00m".format(str(i))
+		print(num + ' ' + title + '\n' + link + '\n')
+		i -= 1
+	os.system('rm .page.html')
+	
+def displayNames(data, flag):
+	totaldata = []	
+	i = 0
+	for line in data:
+		line	= line.strip().split()
+		totaldata.append(line)
+		if flag == 1:
+			print i, line[0]
+		i += 1
+	return totaldata
 
-url 	= sys.argv[1]
-os.system('curl -s -o .page.html "'+ url +'"')
-page 	= open('./.page.html')
-soup	= BeautifulSoup(page, 'html.parser')
-items 	= soup.find_all('item')
+def addData(data):
+	name = raw_input('Enter Name of the Feed : ')
+	url  = raw_input('Enter URL of the Feed  : ')
+	data.write(name + ' ' + url + '\n')
+	print 'Done.'
 
-i = len(items)
-for item in reversed(items):
-	title	= "\033[92m {}\033[00m".format(item.title.string.encode("ascii", "ignore"))
-	link	= "\033[93m {}\033[00m".format(item.link.string.encode("ascii", "ignore"))
-	num	= "\033[91m {}\033[00m".format(str(i))
-	print(num + ' ' + title + '\n' + link + '\n')
-	i -= 1
-os.system('rm .page.html')
+if __name__ == '__main__':
+	data = open('~/.myrsslinks.csv', 'a+')
+
+	if len(sys.argv) == 1:
+		totaldata = displayNames(data, 1)
+		if not totaldata:
+			print 'No data is present'
+			print 'to add use like %s --add' % (sys.argv[0])
+			exit()
+		sno = int(raw_input('Pick from above numbers: '))
+		try:
+			getFeed(totaldata[sno][1])
+		except IndexError:
+			print 'Invalid number'
+			print 'to add use like %s --add' % (sys.argv[0])
+			exit()
+	elif len(sys.argv) == 2:
+		if 'http' in sys.argv[1]:
+			getFeed(sys.argv[1])
+		elif sys.argv[1].isdigit():
+			totaldata	= displayNames(data, 0)
+			sno		= int(sys.argv[1])
+			try: 
+				getFeed(totaldata[sno][1])
+			except IndexError:
+				print 'No such number exists'
+				print 'to add use like %s --add' % (sys.argv[0])
+				exit()
+		elif sys.argv[1] == '--add':
+			addData(data)
+			exit()
+	print "*******\033[91m {}\033[00m *******\n".format(totaldata[sno][0])

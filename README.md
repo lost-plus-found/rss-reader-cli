@@ -18,6 +18,12 @@ $ `cd ~/rss-reader-cli`
 
 $ `sudo make install`
 
+## Updating
+
+$ `cd ~/rss-reader-cli`
+
+$ `sudo make update`
+
 ## Uninstalling
 
 $ `cd ~/rss-reader-cli`

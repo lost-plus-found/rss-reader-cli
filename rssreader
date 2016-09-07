@@ -9,13 +9,16 @@ def getFeed(url):
 	soup	= BeautifulSoup(page, 'html.parser')
 	items 	= soup.find_all('item')
 	i = len(items)
+	Links 	= ['']*(i+1)
 	for item in reversed(items):
 		title	= "\033[92m {}\033[00m".format(item.title.string.encode("ascii", "ignore"))
 		link	= "\033[93m {}\033[00m".format(item.link.string.encode("ascii", "ignore"))
+		Links[i] = item.link.string.encode("ascii", "ignore")
 		num	= "\033[91m {}\033[00m".format(str(i))
 		print(num + ' ' + title + '\n' + link + '\n')
 		i -= 1
 	os.system('rm .page.html')
+	return Links
 	
 def displayNames(data, flag):
 	totaldata = []	
@@ -37,6 +40,7 @@ def addData(data):
 if __name__ == '__main__':	
 	home = os.environ['HOME']
 	data = open(home+'/.myrsslinks.csv', 'a+')
+	tot  = 0
 
 	if len(sys.argv) == 1:
 		totaldata = displayNames(data, 1)
@@ -46,19 +50,19 @@ if __name__ == '__main__':
 			exit()
 		sno = int(raw_input('Pick from above numbers: '))
 		try:
-			getFeed(totaldata[sno][1])
+			Links = getFeed(totaldata[sno][1])
 		except IndexError:
 			print 'Invalid number'
 			print 'to add use like rssreader --add'
 			exit()
 	elif len(sys.argv) == 2:
 		if 'http' in sys.argv[1]:
-			getFeed(sys.argv[1])
+			Links = getFeed(sys.argv[1])
 		elif sys.argv[1].isdigit():
 			totaldata	= displayNames(data, 0)
 			sno		= int(sys.argv[1])
 			try: 
-				getFeed(totaldata[sno][1])
+				Links = getFeed(totaldata[sno][1])
 			except IndexError:
 				print 'No such number exists'
 				print 'to add use like rssreader --add'
@@ -67,3 +71,29 @@ if __name__ == '__main__':
 			addData(data)
 			exit()
 	print "*******\033[91m {}\033[00m *******\n".format(totaldata[sno][0])
+	print 'Pick the numbers to open in browser, * to open all and quit, 0 to quit'
+	print '<start no.> <end no.> or <no.> or *'
+	while 1:
+		tot = len(Links)
+		choice = raw_input('> ')
+		if choice == '*':
+			for i in range(1, tot):
+				os.system('firefox ' + Links[i])
+			break
+		else:
+			choice = map(int, choice.split())
+			if len(choice) == 1:
+				if choice[0] == 0:
+					break
+				if choice[0] > tot or choice[0] < 1:
+					print '> ERR'
+				else:
+					os.system('firefox ' + Links[choice[0]])
+			elif len(choice) >= 2:
+				if choice[0] > choice[1]:
+					choice[0], choice[1] = choice[1], choice[0]
+				if 0 < choice[0] and choice[1] < tot+1:
+					for i in range(choice[0], choice[1]+1):
+                                		os.system('firefox ' + Links[i])
+				else:
+					print '> ERR'

@@ -1,4 +1,4 @@
-
+BINDIR=/usr/local/bin
 UNAME_S:=$(shell uname -s)
 
 .PHONY: install uninstall update
@@ -14,7 +14,6 @@ install:
 
 uninstall:
 	rm -f $(BINDIR)/rssreader
-	rm ~/.myrsslinks.csv
 
 update:
 	rm -f $(BINDIR)/rssreader

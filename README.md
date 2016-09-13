@@ -2,7 +2,11 @@
 
 ## Preinstallations
 
-$ `pip install BeautifulSoup4`
+$ `sudo apt install curl`
+
+$ `sudo apt install python-pip`
+
+$ `sudo pip install BeautifulSoup4`
 
 ## Installing
 
